@@ -48,11 +48,11 @@ if [[ "${VERSION}" == "24.04" ]]; then
       VERSION="22.04"
       MSREPO_LIST="mssql-server-2022"
       msg_info "using repo for ${VERSION} instead of 24.04"
-else
-      read -r -p "Would you like to use mssql-server-preview.list ? <y/N> " prompt
-      if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-      MSREPO_LIST='mssql-server-preview'
-      fi
+# else
+#       read -r -p "Would you like to use mssql-server-preview.list ? <y/N>" prompt
+#       if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
+#       MSREPO_LIST='mssql-server-preview'
+#       fi
 fi
 
 
