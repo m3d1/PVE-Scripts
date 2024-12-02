@@ -27,15 +27,7 @@ msg_ok "Installed Dependencies"
 #repo list source for microsoft sql server
 #VERSION=$(grep "^VERSION_ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
 VERSION=$(awk -F= '$1=="VERSION_ID" { print $2 ;}' /etc/os-release)
-# REPO_LIST="mssql-server-2022"
-# if [[${VERSION} = 20.04 ]]; then
-#       REPO_LIST="mssql-server-2019"
-# else
-#       read -r -p "Would you like to use mssql-server-preview.list ? <y/N> " prompt
-#       if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-#       REPO_LIST="mssql-server-preview"
-#       fi
-# fi
+
 MSREPO_LIST='mssql-server-2022'
 if [[ "${VERSION}" == "20.04" ]]; then
       MSREPO_LIST='mssql-server-2019'
@@ -48,11 +40,11 @@ if [[ "${VERSION}" == "24.04" ]]; then
       VERSION="22.04"
       MSREPO_LIST="mssql-server-2022"
       msg_info "using repo for ${VERSION} instead of 24.04"
-# else
-#       read -r -p "Would you like to use mssql-server-preview.list ? <y/N>" prompt
-#       if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-#       MSREPO_LIST='mssql-server-preview'
-#       fi
+ else
+       read -r -p "Would you like to use mssql-server-preview.list ? <y/N>" prompt
+       if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
+       MSREPO_LIST='mssql-server-preview'
+       fi
 fi
 
 
@@ -102,7 +94,7 @@ fi
 
 msg_info "Adding Microsoft repositories..."
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
-repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/${REPO_LIST}.list)"
+repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/${MSREPO_LIST}.list)"
 $STD add-apt-repository "${repoargs}" -y
 repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/prod.list)"
 $STD add-apt-repository "${repoargs}" -y
