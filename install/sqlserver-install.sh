@@ -54,7 +54,7 @@ else
       MSREPO_LIST='mssql-server-preview'
       fi
 fi
-msk_ok "used REPO for this install is : ${MSREPO_LIST}"
+msg_ok "used REPO for this install is : ${MSREPO_LIST}"
 
 
 
