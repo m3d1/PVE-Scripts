@@ -20,18 +20,19 @@ EOF
 header_info
 echo -e "Loading..."
 APP="sqlserver"
-var_disk="10"
-var_cpu="2"
-var_ram="2048"
+var_disk="30"
+var_cpu="4"
+var_ram="4096"
 var_os="ubuntu"
 var_version="22.04"
+vlan="101"
 variables
 color
 catch_errors
 
 function default_settings() {
   CT_TYPE="1"
-  PW=""
+  PW="P@ssw0rd!"
   CT_ID=$NEXTID
   HN=$NSAPP
   DISK_SIZE="$var_disk"
@@ -47,9 +48,9 @@ function default_settings() {
   SD=""
   NS=""
   MAC=""
-  VLAN=""
-  SSH="no"
-  VERB="no"
+  VLAN="$vlan"
+  SSH="yes"
+  VERB="yes"
   echo_default
 }
 
