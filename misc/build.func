@@ -666,8 +666,9 @@ http://dl-cdn.alpinelinux.org/alpine/latest-stable/community
 EOF'
     pct exec "$CTID" -- ash -c "apk add bash >/dev/null"
   fi
+  msg_info "Downloading and attaching CT installation file"
   lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/main/install/$var_install.sh)" || exit
-
+  msg_ok "Download of the configuration complte"
 }
 
 # This function sets the description of the container.
