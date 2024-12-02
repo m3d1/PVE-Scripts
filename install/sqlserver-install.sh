@@ -36,7 +36,7 @@ VERSION=$(awk -F= '$1=="VERSION_ID" { print $2 ;}' /etc/os-release)
 #       REPO_LIST="mssql-server-preview"
 #       fi
 # fi
-
+MSREPO_LIST='mssql-server-2022'
 if [[ "${VERSION}" == "20.04" ]]; then
       MSREPO_LIST='mssql-server-2019'
 fi
@@ -49,12 +49,11 @@ if [[ "${VERSION}" == "24.04" ]]; then
       MSREPO_LIST="mssql-server-2022"
       msg_info "using repo for ${VERSION} instead of 24.04"
 else
-      read -r -p "Would you like to use mssql-server-preview.list ? <y/N> " prompt
+      read -r -p "Would you like to use mssql-server-preview.list ? <y/N> " $'\n' prompt
       if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       MSREPO_LIST='mssql-server-preview'
       fi
 fi
-msg_ok "used REPO for this install is : ${MSREPO_LIST}"
 
 
 
@@ -74,7 +73,7 @@ MSSQL_PID='Developer'
 
 # Enable SQL Server Agent (recommended)
 SQL_ENABLE_AGENT="y"
-read -r -p "Would to Disable SQL Server Agent (not recommended)? <y/N> " prompt
+read -r -p "Would to Disable SQL Server Agent (not recommended)? <y/N> " $'\n' prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       SQL_ENABLE_AGENT="n"
       msg_ok "SQL Server Agent Disabled"
@@ -83,7 +82,7 @@ fi
 
 # Install SQL Server Full Text Search (optional)
 SQL_INSTALL_FULLTEXT="n"
-read -r -p "Would to Install SQL Server Full Text Search (optional)? <y/N> " prompt
+read -r -p "Would to Install SQL Server Full Text Search (optional)? <y/N> " $'\n' prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       SQL_INSTALL_FULLTEXT="n"
       msg_ok "SQL Server Full Text Search will not be installed"
@@ -93,7 +92,7 @@ fi
 
 # Create an additional user with sysadmin privileges (optional)
 New_SYSADMIN="n"
-read -r -p "Would you like to create additional user with sysadmin privileges (optional)? <y/N> " prompt
+read -r -p "Would you like to create additional user with sysadmin privileges (optional)? <y/N> " $'\n' prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       read -r -p "Enter username : " SQL_INSTALL_USER
       read -r -p "Enter username : " $'\n' SQL_INSTALL_USER_PASSWORD
