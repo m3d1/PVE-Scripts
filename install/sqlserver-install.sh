@@ -44,12 +44,12 @@ if [[ "${VERSION}" == "24.04" ]]; then
       msg_error "MSSQL IS NOT SUPPORTED IN UBUNTU ${VERSION} USE 22.04 FOR YOUR PRODUCTION DEPLOYEMENT"
       msg_info "adding missing dependencies to the system ...."
       curl -OL http://archive.ubuntu.com/ubuntu/pool/main/o/openldap/libldap-2.5-0_2.5.18+dfsg-0ubuntu0.22.04.1_amd64.deb
-      sudo apt-get install ./libldap-2.5-0_2.5.18+dfsg-0ubuntu0.22.04.1_amd64.deb
+      $STD apt-get install ./libldap-2.5-0_2.5.18+dfsg-0ubuntu0.22.04.1_amd64.deb
       VERSION="22.04"
       MSREPO_LIST="mssql-server-2022"
       msg_info "using repo for ${VERSION} instead of 24.04"
 else
-      read -r -p "Would you like to use mssql-server-preview.list ? <y/N> " $'\n' prompt
+      read -r -p "Would you like to use mssql-server-preview.list ? <y/N> " prompt
       if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       MSREPO_LIST='mssql-server-preview'
       fi
@@ -61,7 +61,7 @@ MSSQL_SA_PASSWORD="P@ssw0rd!"
 # Password for the SA user (required)
 read -r -p "Would you to change default SA password (Note:Default password is: ${MSSQL_SA_PASSWORD})? <y/N> " prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-      read -r -p "Type your password :" $'\n' MSSQL_SA_PASSWORD
+      read -r -p "Type your password :" MSSQL_SA_PASSWORD
 fi
 
 
@@ -73,7 +73,7 @@ MSSQL_PID='Developer'
 
 # Enable SQL Server Agent (recommended)
 SQL_ENABLE_AGENT="y"
-read -r -p "Would to Disable SQL Server Agent (not recommended)? <y/N> " $'\n' prompt
+read -r -p "Would to Disable SQL Server Agent (not recommended)? <y/N> " prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       SQL_ENABLE_AGENT="n"
       msg_ok "SQL Server Agent Disabled"
@@ -82,7 +82,7 @@ fi
 
 # Install SQL Server Full Text Search (optional)
 SQL_INSTALL_FULLTEXT="n"
-read -r -p "Would to Install SQL Server Full Text Search (optional)? <y/N> " $'\n' prompt
+read -r -p "Would to Install SQL Server Full Text Search (optional)? <y/N> " prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       SQL_INSTALL_FULLTEXT="n"
       msg_ok "SQL Server Full Text Search will not be installed"
@@ -92,10 +92,10 @@ fi
 
 # Create an additional user with sysadmin privileges (optional)
 New_SYSADMIN="n"
-read -r -p "Would you like to create additional user with sysadmin privileges (optional)? <y/N> " $'\n' prompt
+read -r -p "Would you like to create additional user with sysadmin privileges (optional)? <y/N> " prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       read -r -p "Enter username : " SQL_INSTALL_USER
-      read -r -p "Enter username : " $'\n' SQL_INSTALL_USER_PASSWORD
+      read -r -p "Enter username : " SQL_INSTALL_USER_PASSWORD
       New_SYSADMIN="y"
 fi
 
@@ -103,21 +103,21 @@ fi
 msg_info "Adding Microsoft repositories..."
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
 repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/${REPO_LIST}.list)"
-sudo add-apt-repository "${repoargs}" -y
+$STD add-apt-repository "${repoargs}" -y
 repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/prod.list)"
-sudo add-apt-repository "${repoargs}" -y
-apt-get update -y
+$STD add-apt-repository "${repoargs}" -y
+$STD apt-get update -y
 msg_ok "Microsoft repo added"
 
 msg_info "Installing Microsoft SQL Server"
-apt-get install -y mssql-server
+$STDapt-get install -y mssql-server
 msg_info "Configuring Microsoft SQL Server"
 msg_info "Running mssql-conf setup..."
-sudo MSSQL_SA_PASSWORD=$MSSQL_SA_PASSWORD \
+$STD MSSQL_SA_PASSWORD=$MSSQL_SA_PASSWORD \
      MSSQL_PID=$MSSQL_PID \
      /opt/mssql/bin/mssql-conf -n setup accept-eula
 msg_info "Installing mssql-tools and unixODBC developer..."
-sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
+$STD ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
 msg_info "Adding SQL Server tools to your path..."
 echo PATH="$PATH:/opt/mssql-tools/bin" >> ~/.bash_profile
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
@@ -134,7 +134,7 @@ fi
 if ([ "${SQL_INSTALL_FULLTEXT}" == "y" ]]; then
 then
     msg_info "Installing SQL Server Full-Text Search..."
-    apt-get install -y mssql-server-fts
+    $STD apt-get install -y mssql-server-fts
 fi
 
 # Configure firewall to allow TCP port 1433:
@@ -143,7 +143,7 @@ fi
 #sudo ufw reload
 
 msg_info "Restarting SQL Server..."
-sudo systemctl restart mssql-server
+$STD systemctl restart mssql-server
 
 # Connect to server and get the version:
 counter=1
