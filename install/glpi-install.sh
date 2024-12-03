@@ -137,9 +137,9 @@ $STD systemctl start mariadb
 sleep 1
 
 # Set the root password
-mysql -e "UPDATE mysql.user SET Password = PASSWORD('${SLQROOTPWD}') WHERE User = 'root'"
+#mysql -e "UPDATE mysql.user SET Password = PASSWORD('${SLQROOTPWD}') WHERE User = 'root'"
 # Remove anonymous user accounts
-mysql -e "DELETE FROM mysql.user WHERE User = ''"
+#mysql -e "DELETE FROM mysql.user WHERE User = ''"
 # Disable remote root login
 mysql -e "DELETE FROM mysql.user WHERE User = 'root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')"
 # Remove the test database
