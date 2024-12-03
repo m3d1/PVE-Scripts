@@ -136,14 +136,8 @@ SQLGLPIPWD=$(openssl rand -base64 48 | cut -c1-12 )
 $STD systemctl start mariadb
 sleep 1
 
-# Set the root password
-#mysql -e "UPDATE mysql.user SET Password = PASSWORD('${SLQROOTPWD}') WHERE User = 'root'"
-# Remove anonymous user accounts
-#mysql -e "DELETE FROM mysql.user WHERE User = ''"
 # Disable remote root login
 mysql -e "DELETE FROM mysql.user WHERE User = 'root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')"
-# Remove the test database
-#mysql -e "DROP DATABASE test"
 # Reload privileges
 mysql -e "FLUSH PRIVILEGES"
 # Create a new database
@@ -208,27 +202,10 @@ cp /etc/php/$PHP_VERSION/apache2/php.ini /etc/php/$PHP_VERSION/apache2/php.ini.b
 sed -i -e 's/session.cookie_httponly =/session.cookie_httponly = on/g' /etc/php/$PHP_VERSION/apache2/php.ini   
 sed -i -e 's/session.cookie_samesite =/session.cookie_samesite = Lax/g' /etc/php/$PHP_VERSION/apache2/php.ini
 
-
 #Activation du module rewrite d'apache
 $STD a2enmod rewrite 
 $STD systemctl restart apache2
 }
-
-# function setup_db()
-#  {
-#  info "Setting up GLPI..."
-#  cd /var/www/html/glpi
-#  php bin/console db:install --db-name=glpi --db-user=glpi_user --db-password=$SQLGLPIPWD
-#  rm -rf /var/www/html/glpi/install
-# }
-
-# default_configuration(){
-# read -r -p "Would you like to to launch a default Configuration? <y/N> " prompt
-# if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-    
-#     setup_db
-# fi
-# }
 
 function save_credentials()
 {
@@ -254,11 +231,7 @@ echo ""
 } >> ~/glpi.creds
 
 msg_info "use : cat glpi.creds to retreive all the credentials"
-cat glpi.creds
 }
-
-
-
 
 check_root
 check_distro
@@ -266,7 +239,6 @@ network_info
 install_packages
 mariadb_configure
 install_glpi
-# default_configuration
 save_credentials
 
 motd_ssh
