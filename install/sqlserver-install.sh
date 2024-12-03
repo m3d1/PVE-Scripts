@@ -95,21 +95,21 @@ fi
 msg_info "Adding Microsoft repositories..."
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
 repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/${MSREPO_LIST}.list)"
-$STD add-apt-repository "${repoargs}" -y
+add-apt-repository "${repoargs}" -y
 repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/prod.list)"
-$STD add-apt-repository "${repoargs}" -y
-$STD apt-get update -y
+add-apt-repository "${repoargs}" -y
+sudo apt-get update -y
 msg_ok "Microsoft repo added"
 
 msg_info "Installing Microsoft SQL Server"
-$STDapt-get install -y mssql-server
+sudo apt-get install -y mssql-server
 msg_info "Configuring Microsoft SQL Server"
 msg_info "Running mssql-conf setup..."
-$STD MSSQL_SA_PASSWORD=$MSSQL_SA_PASSWORD \
+sudo MSSQL_SA_PASSWORD=$MSSQL_SA_PASSWORD \
      MSSQL_PID=$MSSQL_PID \
      /opt/mssql/bin/mssql-conf -n setup accept-eula
 msg_info "Installing mssql-tools and unixODBC developer..."
-$STD ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
+sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
 msg_info "Adding SQL Server tools to your path..."
 echo PATH="$PATH:/opt/mssql-tools/bin" >> ~/.bash_profile
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
