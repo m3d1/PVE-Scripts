@@ -28,7 +28,7 @@ msg_ok "Installed Dependencies"
 #VERSION=$(grep "^VERSION_ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
 VERSION=$(awk -F= '$1=="VERSION_ID" { print $2 ;}' /etc/os-release)
 
-MSREPO_LIST='mssql-server-2022'
+MSREPO_LIST="mssql-server-2022"
 if [[ "${VERSION}" == "20.04" ]]; then
       MSREPO_LIST='mssql-server-2019'
 fi
@@ -43,10 +43,10 @@ if [[ "${VERSION}" == "24.04" ]]; then
  else
        read -r -p "Would you like to use mssql-server-preview.list ? <y/N>" prompt
        if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-       MSREPO_LIST='mssql-server-preview'
+       MSREPO_LIST="mssql-server-preview"
        fi
 fi
-
+ sg_info "using the following repo ${MSREPO_LIST} "
 
 
 MSSQL_SA_PASSWORD="P@ssw0rd!"
@@ -94,6 +94,9 @@ fi
 
 msg_info "Adding Microsoft repositories..."
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+echo " adding new repo : https://packages.microsoft.com/config/ubuntu/${VERSION}/${MSREPO_LIST}.list)"
+echo " adding new repo : https://packages.microsoft.com/config/ubuntu/${VERSION}/prod.list"
+sleep 5
 repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/${MSREPO_LIST}.list)"
 add-apt-repository "${repoargs}" -y
 repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/prod.list)"
