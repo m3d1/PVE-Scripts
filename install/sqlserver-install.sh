@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+source <(curl -s https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/main/misc/build.func)
 # Copyright (c) 2024 M3d1
 # Author: M3d1
 # License: MIT
@@ -25,8 +25,8 @@ $STD apt-get install -y \
 msg_ok "Installed Dependencies"
 
 #repo list source for microsoft sql server
-#VERSION=$(grep "^VERSION_ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
-VERSION=$(awk -F= '$1=="VERSION_ID" { print $2 ;}' /etc/os-release)
+VERSION=$(grep "^VERSION_ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
+#VERSION=$(awk -F= '$1=="VERSION_ID" { print $2 ;}' /etc/os-release)
 
 MSREPO_LIST="mssql-server-2022"
 if [[ "${VERSION}" == "20.04" ]]; then
@@ -46,7 +46,7 @@ if [[ "${VERSION}" == "24.04" ]]; then
        MSREPO_LIST="mssql-server-preview"
        fi
 fi
- sg_info "using the following repo ${MSREPO_LIST} "
+ msg_info "using the following repo ${MSREPO_LIST} "
 
 
 MSSQL_SA_PASSWORD="P@ssw0rd!"
@@ -120,14 +120,12 @@ source ~/.bashrc
 
 
 if [[ "${SQL_ENABLE_AGENT}" == "y" ]]; then
-then
-  msg_info "Enabling SQL Server Agent..."
+msg_info "Enabling SQL Server Agent..."
 sudo /opt/mssql/bin/mssql-conf set sqlagent.enabled true
 fi
 
 # Optional SQL Server Full Text Search installation:
-if ([ "${SQL_INSTALL_FULLTEXT}" == "y" ]]; then
-then
+if [[ "${SQL_INSTALL_FULLTEXT}" == "y" ]]; then
     msg_info "Installing SQL Server Full-Text Search..."
     $STD apt-get install -y mssql-server-fts
 fi
@@ -165,7 +163,6 @@ fi
 
 # Optional new user creation:
 if [[ "${New_SYSADMIN}" == "y" ]]; then
-then
   echo Creating user $SQL_INSTALL_USER
   /opt/mssql-tools/bin/sqlcmd \
     -S localhost \
