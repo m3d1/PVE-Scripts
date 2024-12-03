@@ -143,7 +143,7 @@ sleep 1
 # Disable remote root login
 mysql -e "DELETE FROM mysql.user WHERE User = 'root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')"
 # Remove the test database
-mysql -e "DROP DATABASE test"
+#mysql -e "DROP DATABASE test"
 # Reload privileges
 mysql -e "FLUSH PRIVILEGES"
 # Create a new database
