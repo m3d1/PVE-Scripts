@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Copyright (c) 2021-2024 community-scripts ORG
 # Author: m3d1
 # License: MIT
@@ -138,7 +137,7 @@ $STD systemctl start mariadb
 sleep 1
 
 # Set the root password
-mysql -e "UPDATE mysql.user SET Password = PASSWORD('$SLQROOTPWD') WHERE User = 'root'"
+mysql -e "UPDATE mysql.user SET Password = PASSWORD('${SLQROOTPWD}') WHERE User = 'root'"
 # Remove anonymous user accounts
 mysql -e "DELETE FROM mysql.user WHERE User = ''"
 # Disable remote root login
@@ -203,31 +202,33 @@ echo "ServerTokens Prod" >> /etc/apache2/apache2.conf
 # Setup Cron task
 echo "*/2 * * * * www-data /usr/bin/php /var/www/html/glpi/front/cron.php &>/dev/null" >> /etc/cron.d/glpi
 
+#enable session.cookie_httponly
+PHP_VERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -f1-2 -d".")
+cp /etc/php/$PHP_VERSION/apache2/php.ini /etc/php/$PHP_VERSION/apache2/php.ini.back
+sed -i -e 's/session.cookie_httponly =/session.cookie_httponly = on/g' /etc/php/$PHP_VERSION/apache2/php.ini   
+sed -i -e 's/session.cookie_samesite =/session.cookie_samesite = Lax/g' /etc/php/$PHP_VERSION/apache2/php.ini
+
 
 #Activation du module rewrite d'apache
 $STD a2enmod rewrite 
 $STD systemctl restart apache2
 }
 
-function setup_db()
- {
- info "Setting up GLPI..."
- cd /var/www/html/glpi
- php bin/console db:install --db-name=glpi --db-user=glpi_user --db-password=$SQLGLPIPWD
- rm -rf /var/www/html/glpi/install
-}
+# function setup_db()
+#  {
+#  info "Setting up GLPI..."
+#  cd /var/www/html/glpi
+#  php bin/console db:install --db-name=glpi --db-user=glpi_user --db-password=$SQLGLPIPWD
+#  rm -rf /var/www/html/glpi/install
+# }
 
-default_configuration(){
-read -r -p "Would you like to to launch a default Configuration? <y/N> " prompt
-if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-    #enable session.cookie_httponly
-    PHP_VERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -f1-2 -d".")
-    cp /etc/php/$PHP_VERSION/apache2/php.ini /etc/php/$PHP_VERSION/apache2/php.ini.back
-    sed -i -e 's/session.cookie_httponly =/session.cookie_httponly = on/g' /etc/php/$PHP_VERSION/apache2/php.ini   
-    sed -i -e 's/session.cookie_samesite =/session.cookie_samesite = Lax/g' /etc/php/$PHP_VERSION/apache2/php.ini
-    setup_db
-fi
-}
+# default_configuration(){
+# read -r -p "Would you like to to launch a default Configuration? <y/N> " prompt
+# if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
+    
+#     setup_db
+# fi
+# }
 
 function save_credentials()
 {
@@ -265,8 +266,7 @@ network_info
 install_packages
 mariadb_configure
 install_glpi
-default_configuration
-display_credentials
+# default_configuration
 save_credentials
 
 motd_ssh
