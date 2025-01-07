@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Copyright (c) 2024 M3d1
 # Author: M3d1
 # License: MIT
@@ -24,10 +25,18 @@ $STD apt-get install -y \
 msg_ok "Installed Dependencies"
 
 #repo list source for microsoft sql server
-VERSION=$(grep "^VERSION_ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
-#VERSION=$(awk -F= '$1=="VERSION_ID" { print $2 ;}' /etc/os-release)
+#VERSION=$(grep "^VERSION_ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
+VERSION=$(awk -F= '$1=="VERSION_ID" { print $2 ;}' /etc/os-release)
+# REPO_LIST="mssql-server-2022"
+# if [[${VERSION} = 20.04 ]]; then
+#       REPO_LIST="mssql-server-2019"
+# else
+#       read -r -p "Would you like to use mssql-server-preview.list ? <y/N> " prompt
+#       if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
+#       REPO_LIST="mssql-server-preview"
+#       fi
+# fi
 
-MSREPO_LIST="mssql-server-2022"
 if [[ "${VERSION}" == "20.04" ]]; then
       MSREPO_LIST='mssql-server-2019'
 fi
@@ -35,24 +44,25 @@ if [[ "${VERSION}" == "24.04" ]]; then
       msg_error "MSSQL IS NOT SUPPORTED IN UBUNTU ${VERSION} USE 22.04 FOR YOUR PRODUCTION DEPLOYEMENT"
       msg_info "adding missing dependencies to the system ...."
       curl -OL http://archive.ubuntu.com/ubuntu/pool/main/o/openldap/libldap-2.5-0_2.5.18+dfsg-0ubuntu0.22.04.1_amd64.deb
-      $STD apt-get install ./libldap-2.5-0_2.5.18+dfsg-0ubuntu0.22.04.1_amd64.deb
+      sudo apt-get install ./libldap-2.5-0_2.5.18+dfsg-0ubuntu0.22.04.1_amd64.deb
       VERSION="22.04"
       MSREPO_LIST="mssql-server-2022"
       msg_info "using repo for ${VERSION} instead of 24.04"
- else
-       read -r -p "Would you like to use mssql-server-preview.list ? <y/N>" prompt
-       if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-       MSREPO_LIST="mssql-server-preview"
-       fi
+else
+      read -r -p "Would you like to use mssql-server-preview.list ? <y/N> " prompt
+      if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
+      MSREPO_LIST='mssql-server-preview'
+      fi
 fi
- msg_info "using the following repo ${MSREPO_LIST} "
+msg_ok "used REPO for this install is : ${MSREPO_LIST}"
+
 
 
 MSSQL_SA_PASSWORD="P@ssw0rd!"
 # Password for the SA user (required)
 read -r -p "Would you to change default SA password (Note:Default password is: ${MSSQL_SA_PASSWORD})? <y/N> " prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
-      read -r -p "Type your password :" MSSQL_SA_PASSWORD
+      read -r -p "Type your password :" $'\n' MSSQL_SA_PASSWORD
 fi
 
 
@@ -86,25 +96,22 @@ New_SYSADMIN="n"
 read -r -p "Would you like to create additional user with sysadmin privileges (optional)? <y/N> " prompt
 if [[ "${prompt,,}" =~ ^(y|yes)$ ]]; then
       read -r -p "Enter username : " SQL_INSTALL_USER
-      read -r -p "Enter username : " SQL_INSTALL_USER_PASSWORD
+      read -r -p "Enter username : " $'\n' SQL_INSTALL_USER_PASSWORD
       New_SYSADMIN="y"
 fi
 
 
 msg_info "Adding Microsoft repositories..."
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
-echo " adding new repo : https://packages.microsoft.com/config/ubuntu/${VERSION}/${MSREPO_LIST}.list)"
-echo " adding new repo : https://packages.microsoft.com/config/ubuntu/${VERSION}/prod.list"
-sleep 5
-repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/${MSREPO_LIST}.list)"
-add-apt-repository "${repoargs}" -y
+repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/${REPO_LIST}.list)"
+sudo add-apt-repository "${repoargs}" -y
 repoargs="$(curl https://packages.microsoft.com/config/ubuntu/${VERSION}/prod.list)"
-add-apt-repository "${repoargs}" -y
-sudo apt-get update -y
+sudo add-apt-repository "${repoargs}" -y
+apt-get update -y
 msg_ok "Microsoft repo added"
 
 msg_info "Installing Microsoft SQL Server"
-sudo apt-get install -y mssql-server
+apt-get install -y mssql-server
 msg_info "Configuring Microsoft SQL Server"
 msg_info "Running mssql-conf setup..."
 sudo MSSQL_SA_PASSWORD=$MSSQL_SA_PASSWORD \
@@ -119,14 +126,16 @@ source ~/.bashrc
 
 
 if [[ "${SQL_ENABLE_AGENT}" == "y" ]]; then
-msg_info "Enabling SQL Server Agent..."
+then
+  msg_info "Enabling SQL Server Agent..."
 sudo /opt/mssql/bin/mssql-conf set sqlagent.enabled true
 fi
 
 # Optional SQL Server Full Text Search installation:
-if [[ "${SQL_INSTALL_FULLTEXT}" == "y" ]]; then
+if ([ "${SQL_INSTALL_FULLTEXT}" == "y" ]]; then
+then
     msg_info "Installing SQL Server Full-Text Search..."
-    $STD apt-get install -y mssql-server-fts
+    apt-get install -y mssql-server-fts
 fi
 
 # Configure firewall to allow TCP port 1433:
@@ -135,7 +144,7 @@ fi
 #sudo ufw reload
 
 msg_info "Restarting SQL Server..."
-$STD systemctl restart mssql-server
+sudo systemctl restart mssql-server
 
 # Connect to server and get the version:
 counter=1
@@ -162,6 +171,7 @@ fi
 
 # Optional new user creation:
 if [[ "${New_SYSADMIN}" == "y" ]]; then
+then
   echo Creating user $SQL_INSTALL_USER
   /opt/mssql-tools/bin/sqlcmd \
     -S localhost \

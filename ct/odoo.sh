@@ -1,29 +1,32 @@
+@ -0,0 +1,71 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/main/misc/build.func)
-# Copyright (c) 2021-2024 tteck
-# Author: tteck (tteckster)
+# Copyright (c) 2024 M3d1
+# Author: Mehdi BASRI (M3d1)
 # License: MIT
 # https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 
 function header_info {
 clear
 cat <<"EOF"
- _____         __    __    _
-/__  /  ____ _/ /_  / /_  (_)  __
-  / /  / __ `/ __ \/ __ \/ / |/_/
- / /__/ /_/ / /_/ / /_/ / />  <
-/____/\__,_/_.___/_.___/_/_/|_|
-
+ ________  ________  ________  ________     
+|\   __  \|\   ___ \|\   __  \|\   __  \    
+\ \  \|\  \ \  \_|\ \ \  \|\  \ \  \|\  \   
+ \ \  \\\  \ \  \ \\ \ \  \\\  \ \  \\\  \  
+  \ \  \\\  \ \  \_\\ \ \  \\\  \ \  \\\  \ 
+   \ \_______\ \_______\ \_______\ \_______\
+    \|_______|\|_______|\|_______|\|_______|
+    
 EOF
 }
 header_info
 echo -e "Loading..."
-APP="Zabbix"
-var_disk="6"
+APP="Ubuntu"
+var_disk="10"
 var_cpu="2"
-var_ram="4096"
-var_os="debian"
-var_version="12"
+var_ram="2048"
+var_os="ubuntu"
+var_version="22.04"
 variables
 color
 catch_errors
@@ -56,12 +59,11 @@ function update_script() {
 header_info
 check_container_storage
 check_container_resources
-if [[ ! -f /etc/zabbix/zabbix_server.conf ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
-msg_info "Updating $APP LXC"
+if [[ ! -d /var ]]; then msg_error "No ${APP} Installation Found!"; exit; fi
+msg_info "Updating ${APP} LXC"
 apt-get update &>/dev/null
 apt-get -y upgrade &>/dev/null
-systemctl restart zabbix-server
-msg_ok "Updated $APP LXC"
+msg_ok "Updated ${APP} LXC"
 exit
 }
 
@@ -70,5 +72,3 @@ build_container
 description
 
 msg_ok "Completed Successfully!\n"
-echo -e "${APP} should be reachable by going to the following URL.
-         ${BL}http://${IP}/zabbix${CL} \n"

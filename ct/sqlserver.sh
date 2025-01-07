@@ -1,60 +1,47 @@
+@ -0,0 +1,71 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/main/misc/build.func)
 # Copyright (c) 2024 M3d1
-# Author: M3d1 (tteckster)
+# Author: Mehdi BASRI (M3d1)
 # License: MIT
 # https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 
 function header_info {
 clear
 cat <<"EOF"
-   _____ ____    __    _____  _____  ______       __ _____  ______
-  / ___// __ \  / /   / ___/ / ___/ /     / \    / // ___/ /     /
-  \__ \/ / / / / /    \__ \ / ___/ / ____/ \ \  / // ___/ / ____/ 
- ___/ / /_/ / / /___ ___/ // /__  /  /\  \  \ \/ // /__  /  /\  \  
-/____/\___\_\/_____//____//____/ /__/  \__\  \__//____/ /__/  \__\  
-    
+ ________  ________  ___               ________  _______   ________  ___      ___ _______   ________     
+|\   ____\|\   __  \|\  \             |\   ____\|\  ___ \ |\   __  \|\  \    /  /|\  ___ \ |\   __  \    
+\ \  \___|\ \  \|\  \ \  \            \ \  \___|\ \   __/|\ \  \|\  \ \  \  /  / | \   __/|\ \  \|\  \   
+ \ \_____  \ \  \\\  \ \  \            \ \_____  \ \  \_|/_\ \   _  _\ \  \/  / / \ \  \_|/_\ \   _  _\  
+  \|____|\  \ \  \\\  \ \  \____        \|____|\  \ \  \_|\ \ \  \\  \\ \    / /   \ \  \_|\ \ \  \\  \| 
+    ____\_\  \ \_____  \ \_______\        ____\_\  \ \_______\ \__\\ _\\ \__/ /     \ \_______\ \__\\ _\ 
+   |\_________\|___| \__\|_______|       |\_________\|_______|\|__|\|__|\|__|/       \|_______|\|__|\|__|
+   \|_________|     \|__|                \|_________|                                                    
+                                                                                                             
 EOF
 }
-
 header_info
 echo -e "Loading..."
-APP="sqlserver"
-var_disk="30"
-var_cpu="4"
-var_ram="4096"
+APP="Ubuntu"
+var_tags="database"
+var_disk="10"
+var_cpu="2"
+var_ram="2048"
 var_os="ubuntu"
 var_version="22.04"
-net="192.168.101.207/24"
-gw="192.168.101.1"
-vlan="101"
+var_unprivileged="1"
+
+# App Output & Base Settings
+header_info "$APP"
+base_settings
+
+# Core
 variables
 color
 catch_errors
-
-function default_settings() {
-  CT_TYPE="1"
-  PW="P@ssw0rd!"
-  CT_ID=$NEXTID
-  HN=$NSAPP
-  DISK_SIZE="$var_disk"
-  CORE_COUNT="$var_cpu"
-  RAM_SIZE="$var_ram"
-  BRG="vmbr0"
-  NET="$net"
-  GATE="$gw"
-  APT_CACHER=""
-  APT_CACHER_IP=""
-  DISABLEIP6="yes"
-  MTU=""
-  SD=""
-  NS=""
-  MAC=""
-  VLAN="$vlan"
-  SSH="yes"
-  VERB="yes"
-  echo_default
-}
+variables
+color
+catch_errors
 
 function update_script() {
 header_info

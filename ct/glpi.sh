@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source <(curl -s https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/main/misc/build.func)
+source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
 # Copyright (c) 2021-2024 M3di1
 # Author: M3di1 (M3di1)
 # License: MIT
@@ -20,12 +20,14 @@ EOF
 }
 header_info
 echo -e "Loading..."
-APP="glpi"
+APP="GLPI"
+var_tags="ITAD;foss"
 var_disk="2"
 var_cpu="2"
-var_ram="2048"
+var_ram="1024"
 var_os="ubuntu"
 var_version="22.04"
+var_unprivileged="1"
 variables
 color
 catch_errors
@@ -49,8 +51,8 @@ function default_settings() {
   NS=""
   MAC=""
   VLAN=""
-  SSH="yes"
-  VERB="yes"
+  SSH="no"
+  VERB="no"
   echo_default
 }
 
