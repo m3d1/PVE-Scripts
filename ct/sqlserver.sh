@@ -22,7 +22,7 @@ EOF
 }
 header_info
 echo -e "Loading..."
-APP="Ubuntu"
+APP="sqlserver"
 var_tags="database"
 var_disk="10"
 var_cpu="2"
