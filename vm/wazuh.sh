@@ -18,7 +18,8 @@ EOF
 }
 header_info
 echo -e "\n Loading..."
-VERSION="4.9.2"
+IMAGE_DEFAULT_PATH="/var/lib/vz/import"
+VERSION="4.10.1"
 GEN_MAC=02:$(openssl rand -hex 5 | awk '{print toupper($0)}' | sed 's/\(..\)/\1:/g; s/.$//')
 GEN_MAC_LAN=02:$(openssl rand -hex 5 | awk '{print toupper($0)}' | sed 's/\(..\)/\1:/g; s/.$//')
 NEXTID=$(pvesh get /cluster/nextid)
@@ -410,10 +411,10 @@ msg_ok "Virtual Machine ID is ${CL}${BL}$VMID${CL}."
  URL=https://packages.wazuh.com/4.x/vm/wazuh-${VERSION}.ova
  sleep 2
 
-if [ ! -f /var/lib/vz/import/wazuh-${VERSION}.ova ];then  
+if [ ! -f $IMAGE_DEFAULT_PATH/wazuh-${VERSION}.ova ];then  
  msg_info "Retrieving the URL for Wazuh ${VERSION} Disk Image"
  msg_ok "${CL}${BL}${URL}${CL}"
- wget -P /var/lib/vz/import/ -q --show-progress $URL
+ wget -P $IMAGE_DEFAULT_PATH/ -q --show-progress $URL
  echo -en "\e[1A\e[0K"
  msg_ok "Downloaded ${CL}${BL}$FILE${CL}"
 else 
@@ -422,12 +423,12 @@ fi
 
 FILE=$(basename $URL)
 
-if [ ! -d /var/lib/vz/import/wazuh-${VERSION} ];then  
+if [ ! -d $IMAGE_DEFAULT_PATH/wazuh-${VERSION} ];then  
  msg_info "Extracting KVM Disk Image"
- mkdir wazuh-${VERSION}
- tar xvf $FILE -C wazuh-${VERSION}
+ mkdir $IMAGE_DEFAULT_PATH/wazuh-${VERSION}
+ tar xvf $IMAGE_DEFAULT_PATH/$FILE -C $IMAGE_DEFAULT_PATH/wazuh-${VERSION}
 fi
-VMDK_FILE=$(ls /var/lib/vz/import/wazuh-${VERSION}/*.vmdk)
+VMDK_FILE=$(ls $IMAGE_DEFAULT_PATH/wazuh-${VERSION}/*.vmdk)
 
 STORAGE_TYPE=$(pvesm status -storage $STORAGE | awk 'NR>1 {print $2}')
 case $STORAGE_TYPE in
@@ -451,7 +452,7 @@ msg_info "Creating Wazuh VM"
 qm create $VMID -agent 1${MACHINE} -tablet 0 -localtime 1 -cores $CORE_COUNT -memory $RAM_SIZE \
   -name $HN -tags proxmox-helper-scripts,siem,monitoring -net0 vmxnet3,bridge=$BRG,macaddr=$MAC$VLAN$MTU -onboot 1 -ostype l26 -scsihw virtio-scsi-pci
 qm importdisk $VMID ${VMDK_FILE} $STORAGE ${DISK_IMPORT:-} 1>&/dev/null
-qm set $VMID -scsi0 $STORAGE:vm-${VMID}-disk-1 -boot order=scsi0 \
+qm set $VMID -scsi0 $STORAGE:vm-${VMID}-disk-0 -boot order=scsi0 \
   -description "<div align='center'><a href='https://Helper-Scripts.com' target='_blank' rel='noopener noreferrer'><img src='https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/images/logo-81x112.png'/></a>
 
   # Wazuh ${VERSION} VM
@@ -465,3 +466,5 @@ if [ "$START_VM" == "yes" ]; then
   msg_ok "Started Wazuh VM"
 fi
 msg_ok "Completed Successfully! \n"
+echo "More Info at https://documentation.wazuh.com/current/deployment-options/virtual-machine/virtual-machine.html"
+echo "default credentials : login : wazuh-user , password : wazuh "
