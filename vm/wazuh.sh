@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Copyright (c) 2021-2024 m3d1
-# Author: mehdi BASRI1 (m3d1)
+# Copyright (c) 2021-2025 m3d1
+# Author: Mehdi BASRI (m3d1)
 # License: MIT
 
 function header_info {
@@ -17,7 +17,7 @@ function header_info {
 EOF
 }
 header_info
-echo -e "Loading..."
+echo -e "\n Loading..."
 VERSION="4.9.2"
 GEN_MAC=02:$(openssl rand -hex 5 | awk '{print toupper($0)}' | sed 's/\(..\)/\1:/g; s/.$//')
 GEN_MAC_LAN=02:$(openssl rand -hex 5 | awk '{print toupper($0)}' | sed 's/\(..\)/\1:/g; s/.$//')
@@ -29,11 +29,33 @@ RD=$(echo "\033[01;31m")
 BGN=$(echo "\033[4;92m")
 GN=$(echo "\033[1;92m")
 DGN=$(echo "\033[32m")
+
 CL=$(echo "\033[m")
+BOLD=$(echo "\033[1m")
 BFR="\\r\\033[K"
 HOLD="-"
-CM="${GN}✓${CL}"
-CROSS="${RD}✗${CL}"
+TAB=" "
+
+CM="${TAB}✔️${TAB}${CL}"
+CROSS="${TAB}✖️${TAB}${CL}"
+INFO="${TAB}💡${TAB}${CL}"
+OS="${TAB}🖥️${TAB}${CL}"
+CONTAINERTYPE="${TAB}📦${TAB}${CL}"
+DISKSIZE="${TAB}💾${TAB}${CL}"
+CPUCORE="${TAB}🧠${TAB}${CL}"
+RAMSIZE="${TAB}🛠️${TAB}${CL}"
+CONTAINERID="${TAB}🆔${TAB}${CL}"
+HOSTNAME="${TAB}🏠${TAB}${CL}"
+BRIDGE="${TAB}🌉${TAB}${CL}"
+GATEWAY="${TAB}🌐${TAB}${CL}"
+DEFAULT="${TAB}⚙️${TAB}${CL}"
+MACADDRESS="${TAB}🔗${TAB}${CL}"
+VLANTAG="${TAB}🏷️${TAB}${CL}"
+CREATING="${TAB}🚀${TAB}${CL}"
+ADVANCED="${TAB}🧩${TAB}${CL}"
+
+THIN="discard=on,ssd=1," 
+
 set -Eeo pipefail
 trap 'error_handler $LINENO "$BASH_COMMAND"' ERR
 trap cleanup EXIT
@@ -47,10 +69,8 @@ function error_handler() {
 }
 
 function cleanup_vmid() {
-  if qm status $VMID &>/dev/null; then
-    qm stop $VMID &>/dev/null
-    qm destroy $VMID &>/dev/null
-  fi
+  popd >/dev/null
+  rm -rf $TEMP_DIR
 }
 
 function cleanup() {
@@ -60,93 +80,21 @@ function cleanup() {
 
 TEMP_DIR=$(mktemp -d)
 pushd $TEMP_DIR >/dev/null
-function send_line_to_vm() {
-  echo -e "${DGN}Sending line: ${YW}$1${CL}"
-  for ((i = 0; i < ${#1}; i++)); do
-    character=${1:i:1}
-    case $character in
-    " ") character="spc" ;;
-    "-") character="minus" ;;
-    "=") character="equal" ;;
-    ",") character="comma" ;;
-    ".") character="dot" ;;
-    "/") character="slash" ;;
-    "'") character="apostrophe" ;;
-    ";") character="semicolon" ;;
-    '\') character="backslash" ;;
-    '`') character="grave_accent" ;;
-    "[") character="bracket_left" ;;
-    "]") character="bracket_right" ;;
-    "_") character="shift-minus" ;;
-    "+") character="shift-equal" ;;
-    "?") character="shift-slash" ;;
-    "<") character="shift-comma" ;;
-    ">") character="shift-dot" ;;
-    '"') character="shift-apostrophe" ;;
-    ":") character="shift-semicolon" ;;
-    "|") character="shift-backslash" ;;
-    "~") character="shift-grave_accent" ;;
-    "{") character="shift-bracket_left" ;;
-    "}") character="shift-bracket_right" ;;
-    "A") character="shift-a" ;;
-    "B") character="shift-b" ;;
-    "C") character="shift-c" ;;
-    "D") character="shift-d" ;;
-    "E") character="shift-e" ;;
-    "F") character="shift-f" ;;
-    "G") character="shift-g" ;;
-    "H") character="shift-h" ;;
-    "I") character="shift-i" ;;
-    "J") character="shift-j" ;;
-    "K") character="shift-k" ;;
-    "L") character="shift-l" ;;
-    "M") character="shift-m" ;;
-    "N") character="shift-n" ;;
-    "O") character="shift-o" ;;
-    "P") character="shift-p" ;;
-    "Q") character="shift-q" ;;
-    "R") character="shift-r" ;;
-    "S") character="shift-s" ;;
-    "T") character="shift-t" ;;
-    "U") character="shift-u" ;;
-    "V") character="shift-v" ;;
-    "W") character="shift-w" ;;
-    "X") character="shift=x" ;;
-    "Y") character="shift-y" ;;
-    "Z") character="shift-z" ;;
-    "!") character="shift-1" ;;
-    "@") character="shift-2" ;;
-    "#") character="shift-3" ;;
-    '$') character="shift-4" ;;
-    "%") character="shift-5" ;;
-    "^") character="shift-6" ;;
-    "&") character="shift-7" ;;
-    "*") character="shift-8" ;;
-    "(") character="shift-9" ;;
-    ")") character="shift-0" ;;
-    esac
-    qm sendkey $VMID "$character"
-  done
-  qm sendkey $VMID ret
-}
 
-TEMP_DIR=$(mktemp -d)
-pushd $TEMP_DIR >/dev/null
-
-if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "Wazuh " --yesno "This will create a New Wazuh VM. Proceed?" 10 58); then
+if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "Wazuh VM" --yesno "This will create a New Wazuh VM. Proceed?" 10 58); then
   :
 else
-  header_info && echo -e "⚠ User exited script \n" && exit
+  header_info &&   echo -e "${CROSS}${RD}User exited script${CL}\n" && exit
 fi
 
 function msg_info() {
   local msg="$1"
-  echo -ne " ${HOLD} ${YW}${msg}..."
+  echo -ne "${TAB}${YW}${HOLD}${msg}${HOLD}"
 }
 
 function msg_ok() {
   local msg="$1"
-  echo -e "${BFR} ${CM} ${GN}${msg}${CL}"
+  echo -e "${BFR}${CM}${GN}${msg}${CL}"
 }
 
 function msg_error() {
@@ -154,19 +102,30 @@ function msg_error() {
   echo -e "${BFR} ${CROSS} ${RD}${msg}${CL}"
 }
 
+function check_root() {
+  if [[ "$(id -u)" -ne 0 || $(ps -o comm= -p $PPID) == "sudo" ]]; then
+    clear
+    msg_error "Please run this script as root."
+    echo -e "\nExiting..."
+    sleep 2
+    exit
+  fi
+}
+
 function pve_check() {
   if ! pveversion | grep -Eq "pve-manager/8.[1-3]"; then
-    msg_error "This version of Proxmox Virtual Environment is not supported"
+    msg_error "${CROSS}${RD}This version of Proxmox Virtual Environment is not supported"
     echo -e "Requires Proxmox Virtual Environment Version 8.1 or later."
     echo -e "Exiting..."
     sleep 2
     exit
-fi
+  fi
 }
 
 function arch_check() {
   if [ "$(dpkg --print-architecture)" != "amd64" ]; then
-    echo -e "\n ${CROSS} This script will not work with PiMox! \n"
+    echo -e "\n ${INFO}${YWB}This script will not work with PiMox! \n"
+    echo -e "\n ${YWB}Visit https://github.com/asylumexp/Proxmox for ARM64 support. \n"
     echo -e "Exiting..."
     sleep 2
     exit
@@ -188,7 +147,7 @@ function ssh_check() {
 
 function exit-script() {
   clear
-  echo -e "⚠  User exited script \n"
+  echo -e "\n${CROSS}${RD}User exited script${CL}\n"
   exit
 }
 
@@ -197,31 +156,31 @@ function default_settings() {
   VMID="$NEXTID"
   FORMAT=",efitype=4m"
   MACHINE=""
-  DISK_CACHE="cache=writethrough,"
-  HN="haos$stable"
+  DISK_SIZE="40G"
+  DISK_CACHE=""
+  HN="wazuh"
   CPU_TYPE=" -cpu host"
-  CORE_COUNT="2"
+  CORE_COUNT="4"
   RAM_SIZE="4096"
   BRG="vmbr0"
   MAC="$GEN_MAC"
   VLAN=""
   MTU=""
   START_VM="yes"
-  echo -e "${DGN}Using Virtual Machine ID: ${BGN}${VMID}${CL}"
-  echo -e "${DGN}Using Hostname: ${BGN}${HN}${CL}"
-  echo -e "${DGN}Allocated Cores: ${BGN}${CORE_COUNT}${CL}"
-  echo -e "${DGN}Allocated RAM: ${BGN}${RAM_SIZE}${CL}"
-  echo -e "${DGN}Using WAN Bridge: ${BGN}${BRG}${CL}"
-  echo -e "${DGN}Using WAN VLAN: ${BGN}Default${CL}"
-  echo -e "${DGN}Using WAN MAC Address: ${BGN}${MAC}${CL}"
-  echo -e "${DGN}Using LAN MAC Address: ${BGN}${LAN_MAC}${CL}"
-  echo -e "${DGN}Using LAN Bridge: ${BGN}${LAN_BRG}${CL}"
-  echo -e "${DGN}Using LAN VLAN: ${BGN}999${CL}"
-  echo -e "${DGN}Using LAN IP Address: ${BGN}${LAN_IP_ADDR}${CL}"
-  echo -e "${DGN}Using LAN NETMASK: ${BGN}${LAN_NETMASK}${CL}"
-  echo -e "${DGN}Using Interface MTU Size: ${BGN}Default${CL}"
-  echo -e "${DGN}Start VM when completed: ${BGN}yes${CL}"
-  echo -e "${BL}Creating a wazuh VM using the above default settings${CL}"
+  echo -e "${CONTAINERID}${BOLD}${DGN}Virtual Machine ID: ${BGN}${VMID}${CL}"
+  echo -e "${CONTAINERTYPE}${BOLD}${DGN}Machine Type: ${BGN}i440fx${CL}"
+  echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}${DISK_SIZE}${CL}"
+  echo -e "${DISKSIZE}${BOLD}${DGN}Disk Cache: ${BGN}None${CL}"
+  echo -e "${HOSTNAME}${BOLD}${DGN}Hostname: ${BGN}${HN}${CL}"
+  echo -e "${OS}${BOLD}${DGN}CPU Model: ${BGN}KVM64${CL}"
+  echo -e "${CPUCORE}${BOLD}${DGN}CPU Cores: ${BGN}${CORE_COUNT}${CL}"
+  echo -e "${RAMSIZE}${BOLD}${DGN}RAM Size: ${BGN}${RAM_SIZE}${CL}"
+  echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}${BRG}${CL}"
+  echo -e "${MACADDRESS}${BOLD}${DGN}MAC Address: ${BGN}${MAC}${CL}"
+  echo -e "${VLANTAG}${BOLD}${DGN}VLAN: ${BGN}Default${CL}"
+  echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}Default${CL}"
+  echo -e "${GATEWAY}${BOLD}${DGN}Start VM when completed: ${BGN}yes${CL}"
+  echo -e "${CREATING}${BOLD}${DGN}Creating a wazuh VM using the above default settings${CL}"
 }
 
 function advanced_settings() {
@@ -242,6 +201,53 @@ function advanced_settings() {
     fi
   done
 
+  if MACH=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "MACHINE TYPE" --radiolist --cancel-button Exit-Script "Choose Type" 10 58 2 \
+    "i440fx" "Machine i440fx" ON \
+    "q35" "Machine q35" OFF \
+    3>&1 1>&2 2>&3); then
+    if [ $MACH = q35 ]; then
+      echo -e "${CONTAINERTYPE}${BOLD}${DGN}Machine Type: ${BGN}$MACH${CL}"
+      FORMAT=""
+      MACHINE=" -machine q35"
+    else
+      echo -e "${CONTAINERTYPE}${BOLD}${DGN}Machine Type: ${BGN}$MACH${CL}"
+      FORMAT=",efitype=4m"
+      MACHINE=""
+    fi
+  else
+    exit-script
+  fi
+  
+  if DISK_SIZE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Disk Size in GiB (e.g., 10, 20)" 8 58 "$DISK_SIZE" --title "DISK SIZE" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+    DISK_SIZE=$(echo "$DISK_SIZE" | tr -d ' ')
+    if [[ "$DISK_SIZE" =~ ^[0-9]+$ ]]; then
+      DISK_SIZE="${DISK_SIZE}G"
+      echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}$DISK_SIZE${CL}"
+    elif [[ "$DISK_SIZE" =~ ^[0-9]+G$ ]]; then
+      echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}$DISK_SIZE${CL}"
+    else
+      echo -e "${DISKSIZE}${BOLD}${RD}Invalid Disk Size. Please use a number (e.g., 10 or 10G).${CL}"
+      exit-script
+    fi
+  else
+    exit-script
+  fi
+
+  if DISK_CACHE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "DISK CACHE" --radiolist "Choose" --cancel-button Exit-Script 10 58 2 \
+    "0" "None (Default)" ON \
+    "1" "Write Through" OFF \
+    3>&1 1>&2 2>&3); then
+    if [ $DISK_CACHE = "1" ]; then
+      echo -e "${DISKSIZE}${BOLD}${DGN}Disk Cache: ${BGN}Write Through${CL}"
+      DISK_CACHE="cache=writethrough,"
+    else
+      echo -e "${DISKSIZE}${BOLD}${DGN}Disk Cache: ${BGN}None${CL}"
+      DISK_CACHE=""
+    fi
+  else
+    exit-script
+  fi
+
   if VM_NAME=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Hostname" 8 58 wazuh --title "HOSTNAME" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $VM_NAME ]; then
       HN="wazuh"
@@ -249,6 +255,21 @@ function advanced_settings() {
       HN=$(echo ${VM_NAME,,} | tr -d ' ')
     fi
     echo -e "${DGN}Using Hostname: ${BGN}$HN${CL}"
+  else
+    exit-script
+  fi
+
+  if CPU_TYPE1=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "CPU MODEL" --radiolist "Choose" --cancel-button Exit-Script 10 58 2 \
+    "0" "KVM64 (Default)" ON \
+    "1" "Host" OFF \
+    3>&1 1>&2 2>&3); then
+    if [ $CPU_TYPE1 = "1" ]; then
+      echo -e "${OS}${BOLD}${DGN}CPU Model: ${BGN}Host${CL}"
+      CPU_TYPE=" -cpu host"
+    else
+      echo -e "${OS}${BOLD}${DGN}CPU Model: ${BGN}KVM64${CL}"
+      CPU_TYPE=""
+    fi
   else
     exit-script
   fi
@@ -350,6 +371,7 @@ function start_script() {
   fi
 }
 
+check_root
 arch_check
 pve_check
 ssh_check
@@ -369,15 +391,14 @@ while read -r line; do
 done < <(pvesm status -content images | awk 'NR>1')
 VALID=$(pvesm status -content images | awk 'NR>1')
 if [ -z "$VALID" ]; then
-  echo -e "\n${RD}⚠ Unable to detect a valid storage location.${CL}"
-  echo -e "Exiting..."
+  msg_error "Unable to detect a valid storage location."
   exit
 elif [ $((${#STORAGE_MENU[@]} / 3)) -eq 1 ]; then
   STORAGE=${STORAGE_MENU[0]}
 else
   while [ -z "${STORAGE:+x}" ]; do
     STORAGE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "Storage Pools" --radiolist \
-      "Which storage pool you would like to use for the wazuh VM?\n\n" \
+      "Which storage pool you would like to use for ${HN}?\nTo make a selection, use the Spacebar.\n" \
       16 $(($MSG_MAX_LENGTH + 23)) 6 \
       "${STORAGE_MENU[@]}" 3>&1 1>&2 2>&3) || exit
   done
@@ -428,7 +449,7 @@ esac
 msg_ok "Extracted Wazuh Image"
 msg_info "Creating Wazuh VM"
 qm create $VMID -agent 1${MACHINE} -tablet 0 -localtime 1 -cores $CORE_COUNT -memory $RAM_SIZE \
-  -name $HN -tags proxmox-helper-scripts -net0 vmxnet3,bridge=$BRG,macaddr=$MAC$VLAN$MTU -onboot 1 -ostype l26 -scsihw virtio-scsi-pci
+  -name $HN -tags proxmox-helper-scripts,siem,monitoring -net0 vmxnet3,bridge=$BRG,macaddr=$MAC$VLAN$MTU -onboot 1 -ostype l26 -scsihw virtio-scsi-pci
 qm importdisk $VMID ${VMDK_FILE} $STORAGE ${DISK_IMPORT:-} 1>&/dev/null
 qm set $VMID -scsi0 $STORAGE:vm-${VMID}-disk-1 -boot order=scsi0 \
   -description "<div align='center'><a href='https://Helper-Scripts.com' target='_blank' rel='noopener noreferrer'><img src='https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/images/logo-81x112.png'/></a>
