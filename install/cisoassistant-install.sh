@@ -30,14 +30,15 @@ PORTAINER_AGENT_LATEST_VERSION=$(get_latest_release "portainer/agent")
 DOCKER_COMPOSE_LATEST_VERSION=$(get_latest_release "docker/compose")
 DOMAIN=""
 FQDN=""
-IPADRESS=$(ip addr show $INTERFACE | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | head -n 1)
+INTERFACE=$(ip route | awk 'NR==1 {print $5}')
+IPADDRESS=$(ip addr show $INTERFACE | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | head -n 1)
 HOST=$(hostname)
 
 #Prompt
-msg_info "CISO Assistant need to be configured with a FQDN that can be resolved by a dns server , Make sure that the domaine bellow is recheable"
-read -r -p "Provide a domain name (ex: skynet.local) :" DOMAIN
+msg_info "CISO Assistant need to be configured with a FQDN that can be resolved by a dns server , Make sure that the domain bellow is recheable"
+read -r -p "Provide a domain name (ex: skynet.lab) :" DOMAIN
 FQDN=$HOST+"."+$DOMAIN
-msg_info "your A record should contain the following information : IP : $IPADRESS , FQDN : $FQDN "
+msg_info "your A record should contain the following information : IP : $IPADDRESS , FQDN : $FQDN "
 
 function install_docker()
 {
