@@ -37,7 +37,7 @@ HOST=$(hostname)
 #Prompt
 msg_info "CISO Assistant need to be configured with a FQDN that can be resolved by a dns server , Make sure that the domain bellow is recheable"
 read -r -p "Provide a domain name (ex: skynet.lab) :" DOMAIN
-FQDN=$HOST+"."+$DOMAIN
+FQDN=$HOST"."$DOMAIN
 msg_info "your A record should contain the following information : IP : $IPADDRESS , FQDN : $FQDN "
 
 function install_docker()
@@ -84,13 +84,13 @@ function install_ciso()
 # Cloning Github Project Repo
 git clone https://github.com/intuitem/ciso-assistant-community.git
 ## Replace default local value with remote details
-ALLOWED_HOSTS="      - ALLOWED_HOSTS=backend,$hostname"
+ALLOWED_HOSTS="      - ALLOWED_HOSTS=backend,$HOST"
 CISO_ASSISTANT_URL="      - CISO_ASSISTANT_URL=https://$FQDN:8443"
 PUBLIC_BACKEND_URL="      - PUBLIC_BACKEND_API_URL=http://$FQDN:8000/api"
 PUBLIC_BACKEND_API="      - PUBLIC_BACKEND_API_EXPOSED_URL=https://$FQDN:8443/api"
 sed -i -e "s/      - ALLOWED_HOSTS=backend,localhost/$ALLOWED_HOSTS/g" docker-compose.yml
 sed -i -e "s/      - CISO_ASSISTANT_URL=https://localhost:8443/$CISO_ASSISTANT_URL/g" docker-compose.yml
-sed -i -e "s/      - PUBLIC_BACKEND_API_URL=http://backend:8000/api/$PUBLIC_BACKEND_UR/g" docker-compose.yml
+sed -i -e "s/      - PUBLIC_BACKEND_API_URL=http://backend:8000/api/$PUBLIC_BACKEND_URL/g" docker-compose.yml
 sed -i -e "s/      - PUBLIC_BACKEND_API_EXPOSED_URL=https://localhost:8443/api/$PUBLIC_BACKEND_API/g" docker-compose.yml
 # start installation installation
 ./docker-compose.sh
