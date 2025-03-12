@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source <(curl -s https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/main/misc/build.func)
+source <(curl -s https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/cisoassistant-docker/misc/build.func)
 # Copyright (c) 2025 M3d1
 # Author: Mehdi BASRI (M3d1)
 # License: MIT
