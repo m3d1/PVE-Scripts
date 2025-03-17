@@ -128,16 +128,16 @@ function prepare_install() {
 function get_installer() {
   msg_info "download install script to /opt/jumpserver-installer-${VERSION}"
   cd /opt || exit 1
-  if [ ! -d "/opt/jumpserver-installer-${VERSION}" ]; then
-    #https://github.com/jumpserver/jumpserver/releases/download/v{VERSION}/jumpserver-v{VERSION}.tar.gz
-    timeout 60 wget -qO jumpserver-installer-${VERSION}.tar.gz ${DOWNLOAD_URL}/jumpserver/jumpserver/releases/download/v${VERSION}/jumpserver-v${VERSION}.tar.gz || {
+  if [ ! -d "/opt/jumpserver-installer-${VERSION}}" ]; then
+    #https://github.com/jumpserver/installer/releases/download/v{VERSION}/jumpserver-installer-v{VERSION}.tar.gz
+    timeout 60 wget -qO jumpserver-${VERSION}.tar.gz ${DOWNLOAD_URL}/jumpserver/installer/releases/download/v${VERSION}/jumpserver-installer-v${VERSION}.tar.gz || {
       rm -f /opt/jumpserver-installer-${VERSION}.tar.gz
-      msg_error " Failed to download jumpserver-installer-${VERSION}"
+      msg_info -e "[\033[31m ERROR \033[0m] Failed to download jumpserver-installer-${VERSION}"
       exit 1
     }
     tar -xf /opt/jumpserver-installer-${VERSION}.tar.gz -C /opt || {
       rm -rf /opt/jumpserver-installer-${VERSION}
-      msg_error " Failed to unzip jumpserver-installer-${VERSION}"
+      msg_info -e "[\033[31m ERROR \033[0m] Failed to unzip jumpserver-installer-${VERSION}"
       exit 1
     }
     rm -f /opt/jumpserver-installer-${VERSION}.tar.gz
