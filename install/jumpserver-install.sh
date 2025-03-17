@@ -130,7 +130,7 @@ function get_installer() {
   cd /opt || exit 1
   if [ ! -d "/opt/jumpserver-installer-${VERSION}}" ]; then
     #https://github.com/jumpserver/installer/releases/download/v{VERSION}/jumpserver-installer-v{VERSION}.tar.gz
-    timeout 60 wget -qO jumpserver-${VERSION}.tar.gz ${DOWNLOAD_URL}/jumpserver/installer/releases/download/v${VERSION}/jumpserver-installer-v${VERSION}.tar.gz || {
+    timeout 60 wget -qO jumpserver-installer-v${VERSION}.tar.gz ${DOWNLOAD_URL}/jumpserver/installer/releases/download/v${VERSION}/jumpserver-installer-v${VERSION}.tar.gz || {
       rm -f /opt/jumpserver-installer-${VERSION}.tar.gz
       msg_info -e "[\033[31m ERROR \033[0m] Failed to download jumpserver-installer-${VERSION}"
       exit 1
