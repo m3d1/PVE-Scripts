@@ -32,7 +32,7 @@ function check_distro()
 {
 apt install lsb-release -y
 # Allowed Distro Versions
-VERSION=4.7.0
+VERSION=v4.7.0
 DOWNLOAD_URL=https://github.com
 DEBIAN_VERSIONS=("11" "12")
 UBUNTU_VERSIONS=("22.04" "24.04")
@@ -128,16 +128,15 @@ function prepare_install() {
 function get_installer() {
   msg_info "download install script to /opt/jumpserver-installer-${VERSION}"
   cd /opt || exit 1
-  if [ ! -d "/opt/jumpserver-installer-${VERSION}}" ]; then
-    #https://github.com/jumpserver/installer/releases/download/v{VERSION}/jumpserver-installer-v{VERSION}.tar.gz
-    timeout 60 wget -qO jumpserver-installer-v${VERSION}.tar.gz ${DOWNLOAD_URL}/jumpserver/installer/releases/download/v${VERSION}/jumpserver-installer-v${VERSION}.tar.gz || {
+  if [ ! -d "/opt/jumpserver-installer-${VERSION}" ]; then
+    timeout 60 wget -qO jumpserver-installer-${VERSION}.tar.gz ${DOWNLOAD_URL}/jumpserver/installer/releases/download/${VERSION}/jumpserver-installer-${VERSION}.tar.gz || {
       rm -f /opt/jumpserver-installer-${VERSION}.tar.gz
-      msg_info -e "[\033[31m ERROR \033[0m] Failed to download jumpserver-installer-${VERSION}"
+      msg_error " Failed to download jumpserver-installer-${VERSION}"
       exit 1
     }
     tar -xf /opt/jumpserver-installer-${VERSION}.tar.gz -C /opt || {
       rm -rf /opt/jumpserver-installer-${VERSION}
-      msg_info -e "[\033[31m ERROR \033[0m] Failed to unzip jumpserver-installer-${VERSION}"
+      msg_error " Failed to unzip jumpserver-installer-${VERSION}"
       exit 1
     }
     rm -f /opt/jumpserver-installer-${VERSION}.tar.gz
