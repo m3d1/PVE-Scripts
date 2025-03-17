@@ -29,8 +29,8 @@ var_tags="pam"
 var_disk="60"
 var_cpu="4"
 var_ram="4096"
-var_os="ubuntu"
-var_version="24.04"
+var_os="Debian"
+var_version="12"
 var_unprivileged="1"
 
 # App Output & Base Settings

@@ -2,7 +2,7 @@
 # Copyright (c) 2021-2025 M3d1
 # Author: m3di1 - Mehdi BASRI
 # License: MIT
-# https://github.com/m3d1/PVE-Scripts/raw/main/LICENSE
+# https://github.com/m3d1/PVE-Scruots/raw/main/LICENSE
 
 source /dev/stdin <<< "$FUNCTIONS_FILE_PATH"
 color
@@ -32,10 +32,10 @@ function check_distro()
 {
 apt install lsb-release -y
 # Allowed Distro Versions
-VERSION=v4.6.0
+VERSION=v4.7.0
 DOWNLOAD_URL=https://github.com
 DEBIAN_VERSIONS=("11" "12")
-UBUNTU_VERSIONS=("22.04")
+UBUNTU_VERSIONS=("22.04" "24.04")
 DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -rs)
 
@@ -129,7 +129,7 @@ function get_installer() {
   msg_info "download install script to /opt/jumpserver-installer-${VERSION}"
   cd /opt || exit 1
   if [ ! -d "/opt/jumpserver-installer-${VERSION}" ]; then
-    timeout 60 wget -qO jumpserver-installer-${VERSION}.tar.gz ${DOWNLOAD_URL}/jumpserver/installer/releases/download/${VERSION}/jumpserver-installer-${VERSION}.tar.gz || {
+    timeout 60 wget -qO jumpserver-installer-${VERSION}.tar.gz ${DOWNLOAD_URL}/jumpserver/jumpserver/releases/download/${VERSION}/jumpserver-${VERSION}.tar.gz || {
       rm -f /opt/jumpserver-installer-${VERSION}.tar.gz
       msg_error " Failed to download jumpserver-installer-${VERSION}"
       exit 1
