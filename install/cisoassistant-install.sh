@@ -96,9 +96,6 @@ $STD ./docker-compose.sh
 }
 
 
-msg_info "use : cat cisoassistant.creds to retreive all the credentials"
-}
-
 install_docker
 install_ciso
 
