@@ -28,17 +28,6 @@ DOCKER_LATEST_VERSION=$(get_latest_release "moby/moby")
 PORTAINER_LATEST_VERSION=$(get_latest_release "portainer/portainer")
 PORTAINER_AGENT_LATEST_VERSION=$(get_latest_release "portainer/agent")
 DOCKER_COMPOSE_LATEST_VERSION=$(get_latest_release "docker/compose")
-DOMAIN=""
-FQDN=""
-INTERFACE=$(ip route | awk 'NR==1 {print $5}')
-IPADDRESS=$(ip addr show $INTERFACE | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | head -n 1)
-HOST=$(hostname)
-
-#Prompt
-msg_info "CISO Assistant need to be configured with a FQDN that can be resolved by a dns server , Make sure that the domain bellow is recheable"
-read -r -p "Provide a domain name (ex: skynet.lab) :" DOMAIN
-FQDN=$HOST"."$DOMAIN
-msg_info "your A record should contain the following information : IP : $IPADDRESS , FQDN : $FQDN "
 
 function install_docker()
 {
@@ -82,56 +71,36 @@ function install_ciso()
 {
 ## Ciso Assistant Script part
 # Cloning Github Project Repo
+mkdir -p /opt/ciso-sources/
+cd /opt/ciso-sources/
+
+#install python
+$STD apt install python3-pip python3.12-venv
+
+#clone the repo
 git clone https://github.com/intuitem/ciso-assistant-community.git
-## Replace default local value with remote details
-ALLOWED_HOSTS="      - ALLOWED_HOSTS=backend,$HOST"
-CISO_ASSISTANT_URL="      - CISO_ASSISTANT_URL=https://$FQDN:8443"
-PUBLIC_BACKEND_URL="      - PUBLIC_BACKEND_API_URL=http://$FQDN:8000/api"
-PUBLIC_BACKEND_API="      - PUBLIC_BACKEND_API_EXPOSED_URL=https://$FQDN:8443/api"
-sed -i -e "s/      - ALLOWED_HOSTS=backend,localhost/$ALLOWED_HOSTS/g" docker-compose.yml
-sed -i -e "s/      - CISO_ASSISTANT_URL=https://localhost:8443/$CISO_ASSISTANT_URL/g" docker-compose.yml
-sed -i -e "s/      - PUBLIC_BACKEND_API_URL=http://backend:8000/api/$PUBLIC_BACKEND_URL/g" docker-compose.yml
-sed -i -e "s/      - PUBLIC_BACKEND_API_EXPOSED_URL=https://localhost:8443/api/$PUBLIC_BACKEND_API/g" docker-compose.yml
-# start installation installation
-./docker-compose.sh
+
+#go to the config generator
+cd ciso-assistant-community
+cd config
+
+# setting up the python project and dependencies 
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# run the interactive config generator
+python make_config.py
+
+$STD ./docker-compose.sh
 }
 
-function display_credentials()
-{
-info "=======> CISO ASSISTANT installation details  <======="
-info "Default Accounts details:"
-info "USER       -  PASSWORD       -  ACCESS"
-info "admin       -  ChangeMe      -  admin account,"
-echo ""
-info "You can access to your ciso assistant instance from this links:"
-info "http://$FQDN" 
-echo ""
-info "<==========================================>"
-echo ""
-}
-
-function save_credentials()
-{
-{
-info "=======> CISO ASSISTANT installation details  <======="
-info "Default Accounts details:"
-info "USER       -  PASSWORD       -  ACCESS"
-info "admin       -  ChangeMe      -  admin account,"
-echo ""
-info "You can access to your ciso assistant instance from this links:"
-info "http://$FQDN" 
-echo ""
-info "<==========================================>"
-echo ""
-} >> ~/cisoassistant.creds
 
 msg_info "use : cat cisoassistant.creds to retreive all the credentials"
 }
 
 install_docker
 install_ciso
-display_credentials
-save_credentials
 
 motd_ssh
 customize

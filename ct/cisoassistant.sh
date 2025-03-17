@@ -7,11 +7,11 @@ source <(curl -s https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/c
 
 APP="cisoassistant"
 var_tags="GRC"
-var_cpu="2"
-var_ram="2048"
-var_disk="4"
-var_os="debian"
-var_version="12"
+var_cpu="4"
+var_ram="4096"
+var_disk="40"
+var_os="ubuntu"
+var_version="24.04"
 var_unprivileged="1"
 
 header_info "$APP"
