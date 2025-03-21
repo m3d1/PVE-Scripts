@@ -69,7 +69,7 @@ OD_SUPERADMIN=$(openssl rand -base64 48 | cut -c1-12 )
 WEB_SERVER="nginx" 
 HTTP_PROTOCOL="https"
 HTTPS_PORT="443"
-
+INTERFACE="eth0"
 PUBLIC_IP=$(ip addr show $INTERFACE | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | head -n 1)
 HOST=$(hostname)
 DOMAIN_NAME="{$HOST}.local.host" #
