@@ -189,7 +189,6 @@ $STD apt-get install git wget build-essential dnsutils lsb-release libssl-dev li
 # Install PostgreSQL Server
 #--------------------------------------------------
 PG_ALREADY_INSTALLED="False"
-export OD_DB_PORT
 # Let's  first check if postgres already installed
 if [ $INSTALL_PG_SERVER = "True" ]; then
     SERVER_RESULT=`sudo -E -u postgres bash -c "psql -X -p $OD_DB_PORT -c \"SELECT version();\""`
