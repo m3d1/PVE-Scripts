@@ -1,4 +1,3 @@
-@ -0,0 +1,71 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/m3d1/PVE-Scripts/refs/heads/main/misc/build.func)
 # Copyright (c) 2024 M3d1
