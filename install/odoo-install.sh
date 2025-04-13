@@ -191,7 +191,7 @@ $STD apt-get install git wget build-essential dnsutils lsb-release libssl-dev li
 PG_ALREADY_INSTALLED="False"
 # Let's  first check if postgres already installed
 if [ $INSTALL_PG_SERVER = "True" ]; then
-    SERVER_RESULT=`sudo -E -u postgres bash -c "psql -X -p $OD_DB_PORT -c \"SELECT version();\""`
+    SERVER_RESULT='sudo -E -u postgres bash -c "psql -X -p $OD_DB_PORT -c \"SELECT version();\""'
     if [ -z "$SERVER_RESULT" ]; then
         msg_info "No postgres database is installed on port $OD_DB_PORT. So we will install it."
     else
@@ -204,7 +204,7 @@ if [ $INSTALL_PG_SERVER = "True" ]; then
         fi
     fi
 else
-    CLIENT_RESULT=`psql -V`
+    CLIENT_RESULT='psql -V'
     if [ -z "$CLIENT_RESULT" ]; then
         msg_info "No PosgreSQL Client installed. Installing it."
     else
@@ -305,8 +305,8 @@ INSTALL_WKHTMLTOPDF_VERSION='wkhtmltopdf --version'
 if [ $INSTALL_WKHTMLTOPDF = "True" ] && [ -z "$INSTALL_WKHTMLTOPDF_VERSION" ]; then
   msg_info "\n---- Install wkhtml and place shortcuts on correct place for ODOO $OD_VERSION ----"
 
-  OS_RELEASE=`lsb_release -sc`
-  if [ "`getconf LONG_BIT`" == "64" ];then
+  OS_RELEASE='lsb_release -sc'
+  if [ "'getconf LONG_BIT'" == "64" ];then
       #_url=https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1."$OS_RELEASE"_amd64.deb
 	  _url=https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.$OS_RELEASE_amd64.deb
   else
@@ -314,7 +314,7 @@ if [ $INSTALL_WKHTMLTOPDF = "True" ] && [ -z "$INSTALL_WKHTMLTOPDF_VERSION" ]; t
 	  _url=https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.$OS_RELEASE_i386.deb
   fi
   wget $_url
-  $STD sudo dpkg -i `basename $_url`
+  $STD sudo dpkg -i 'basename $_url'
   $STD apt-get install -f -y
 else
   msg_info "Wkhtmltopdf isn't installed due to the choice of the user!"
@@ -498,7 +498,7 @@ DAEMON_OPTS="-c \$CONFIGFILE"
 [ -f \$CONFIGFILE ] || exit 0
 checkpid() {
 [ -f \$PIDFILE ] || return 1
-pid=\`cat \$PIDFILE\`
+pid=\'cat \$PIDFILE\'
 [ -d /proc/\$pid ] && return 0
 return 1
 }
@@ -592,8 +592,8 @@ if [ $INSTALL_CERTIFICATE == "True" ] && [ $CERTIFICATE_TYPE == "ACME" ] && [ ! 
   $STD apt-get install dnsutils dirmngr git wget
 
   # Check if domain is reachable
-    PUBLIC_IP=`dig +short myip.opendns.com @resolver1.opendns.com`
-    REACHED_IP=`dig $DOMAIN_NAME A +short`
+    PUBLIC_IP='dig +short myip.opendns.com @resolver1.opendns.com'
+    REACHED_IP='dig $DOMAIN_NAME A +short'
     if [[ $REACHED_IP == $PUBLIC_IP ]]; then
         INSTALL_CERTIFICATE="True"
     else
