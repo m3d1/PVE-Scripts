@@ -32,7 +32,7 @@ function check_distro()
 {
 apt install lsb-release -y
 # Allowed Distro Versions
-VERSION=v4.7.0
+VERSION=v4.9.0
 DOWNLOAD_URL=https://github.com
 DEBIAN_VERSIONS=("11" "12")
 UBUNTU_VERSIONS=("22.04" "24.04")
