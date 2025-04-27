@@ -37,7 +37,7 @@ DOWNLOAD_URL=https://github.com
 DEBIAN_VERSIONS=("11" "12")
 UBUNTU_VERSIONS=("22.04" "24.04")
 DISTRO=$(lsb_release -is)
-VERSION=$(lsb_release -rs)
+OS_VERSION=$(lsb_release -rs)
 
 
 if [[ "${OS}" == 'Darwin' ]]; then
@@ -48,10 +48,10 @@ fi
 
 # Debian Distribution Check
 if [ "$DISTRO" == "Debian" ]; then
-        if [[ " ${DEBIAN_VERSIONS[*]} " == *" $VERSION "* ]]; then
-                msg_info "the OS: $DISTRO $VERSION is compatible."
+        if [[ " ${DEBIAN_VERSIONS[*]} " == *" $OS_VERSION "* ]]; then
+                msg_info "the OS: $DISTRO $OS_VERSION is compatible."
         else
-                msg_error "This OS $DISTRO $VERSION is not compatible"
+                msg_error "This OS $DISTRO $OS_VERSION is not compatible"
                 msg_error "Would you like to force the installation?"
                 msg_info "Would you like to continue? [y/N]"
                 read response
@@ -68,10 +68,10 @@ if [ "$DISTRO" == "Debian" ]; then
 
 # Ubuntu Distribution Check
 elif [ "$DISTRO" == "Ubuntu" ]; then
-        if [[ " ${UBUNTU_VERSIONS[*]} " == *" $VERSION "* ]]; then
-                msg_info "the OS: $DISTRO $VERSION is compatible."
+        if [[ " ${UBUNTU_VERSIONS[*]} " == *" $OS_VERSION "* ]]; then
+                msg_info "the OS: $DISTRO $OS_VERSION is compatible."
         else
-                msg_error "This OS $DISTRO $VERSION is not compatible"
+                msg_error "This OS $DISTRO $OS_VERSION is not compatible"
                 msg_error "Would you like to force the installation?"
                 msg_info "Would you like to continue? [y/N]"
                 read response
